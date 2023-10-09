@@ -2,6 +2,10 @@ from util import *
 from rbm import RestrictedBoltzmannMachine 
 from dbn import DeepBeliefNet
 
+'''
+        DON'T TOUCH
+'''
+
 if __name__ == "__main__":
 
     image_size = [28,28]
