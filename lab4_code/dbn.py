@@ -127,13 +127,13 @@ class DeepBeliefNet():
 
         try :
 
-            self.loadfromfile_rbm(loc="trained_rbm",name="vis--hid")
+            self.loadfromfile_rbm(loc="lab4_code/trained_rbm",name="vis--hid")
             self.rbm_stack["vis--hid"].untwine_weights()            
             
-            self.loadfromfile_rbm(loc="trained_rbm",name="hid--pen")
+            self.loadfromfile_rbm(loc="lab4_code/trained_rbm",name="hid--pen")
             self.rbm_stack["hid--pen"].untwine_weights()
             
-            self.loadfromfile_rbm(loc="trained_rbm",name="pen+lbl--top")        
+            self.loadfromfile_rbm(loc="lab4_code/trained_rbm",name="pen+lbl--top")        
 
         except IOError :
 
@@ -143,21 +143,21 @@ class DeepBeliefNet():
             """ 
             CD-1 training for vis--hid 
             """            
-            self.savetofile_rbm(loc="trained_rbm",name="vis--hid")
+            self.savetofile_rbm(loc="lab4_code/trained_rbm",name="vis--hid")
 
             print ("training hid--pen")
             """ 
             CD-1 training for hid--pen 
             """            
             self.rbm_stack["vis--hid"].untwine_weights()            
-            self.savetofile_rbm(loc="trained_rbm",name="hid--pen")            
+            self.savetofile_rbm(loc="lab4_code/trained_rbm",name="hid--pen")            
 
             print ("training pen+lbl--top")
             """ 
             CD-1 training for pen+lbl--top 
             """
             self.rbm_stack["hid--pen"].untwine_weights()
-            self.savetofile_rbm(loc="trained_rbm",name="pen+lbl--top")            
+            self.savetofile_rbm(loc="lab4_code/trained_rbm",name="pen+lbl--top")            
 
         return    
 
@@ -204,9 +204,9 @@ class DeepBeliefNet():
 
                 if it % self.print_period == 0 : print ("iteration=%7d"%it)
                         
-            self.savetofile_dbn(loc="trained_dbn",name="vis--hid")
-            self.savetofile_dbn(loc="trained_dbn",name="hid--pen")
-            self.savetofile_rbm(loc="trained_dbn",name="pen+lbl--top")            
+            self.savetofile_dbn(loc="lab4_code/trained_dbn",name="vis--hid")
+            self.savetofile_dbn(loc="lab4_code/trained_dbn",name="hid--pen")
+            self.savetofile_rbm(loc="lab4_code/trained_dbn",name="pen+lbl--top")            
 
         return
 

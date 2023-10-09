@@ -1,5 +1,6 @@
 from util import *
 
+
 class RestrictedBoltzmannMachine():
     '''
     For more details : A Practical Guide to Training Restricted Boltzmann Machines https://www.cs.toronto.edu/~hinton/absps/guideTR.pdf
@@ -84,6 +85,10 @@ class RestrictedBoltzmannMachine():
 	    # [TODO TASK 4.1] run k=1 alternating Gibbs sampling : v_0 -> h_0 ->  v_1 -> h_1.
             # you may need to use the inference functions 'get_h_given_v' and 'get_v_given_h'.
             # note that inference methods returns both probabilities and activations (samples from probablities) and you may have to decide when to use what.
+            # k is the number of steps of alternating sampling 
+            
+            # minibatch of size 200
+            self.get_h_given_v(visible_trainset[:200])
 
             # [TODO TASK 4.1] update the parameters using function 'update_params'
             
@@ -130,7 +135,7 @@ class RestrictedBoltzmannMachine():
 
     def get_h_given_v(self,visible_minibatch):
         
-        """Compute probabilities p(h|v) and activations h ~ p(h|v) 
+        """Compute probabilities p(h|v) and activations h ~ p(h|v)
 
         Uses undirected weight "weight_vh" and bias "bias_h"
         
@@ -145,9 +150,22 @@ class RestrictedBoltzmannMachine():
 
         n_samples = visible_minibatch.shape[0]
 
-        # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of hidden layer (replace the zeros below) 
+        # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of hidden layer (replace the zeros below)
+        #  The probability of a hidden unit j turning ON can then b e driven from the visible units by sampling from p(hj = 1) = σ(bj + ∑i wij vi)
+        print("WEIGHT SHAPE, MINIB", self.weight_vh.shape, visible_minibatch.shape, self.bias_h.shape)
+        mult = np.outer(self.weight_vh, visible_minibatch)
+        print("mult shape ", mult.shape)
+        sum = np.sum(mult, axis=0)
+        print("sum ", sum.shape)
+        p_h_given_v = sigmoid(self.bias_h + sum)
+        print("H GOVEN V ", p_h_given_v)
+        h = np.zeros(n_samples)
+        for i, p in enumerate(p_h_given_v):
+            if p > 0.5:
+                h[i] = 1
+
         
-        return np.zeros((n_samples,self.ndim_hidden)), np.zeros((n_samples,self.ndim_hidden))
+        return (p_h_given_v, h)
 
 
     def get_v_given_h(self,hidden_minibatch):
