@@ -24,7 +24,7 @@ if __name__ == "__main__":
                                      batch_size=10
     )
     
-    rbm.cd1(visible_trainset=train_imgs, n_iterations=10000)
+    rbm.cd1(visible_trainset=train_imgs, n_iterations=800)#n_iterations=10000)      changed to 800 because 784/minib_size * 20epochs ≈ 800
     
     ''' deep- belief net '''
 

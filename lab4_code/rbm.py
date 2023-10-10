@@ -79,6 +79,7 @@ class RestrictedBoltzmannMachine():
         print ("learning CD1")
         
         n_samples = visible_trainset.shape[0]
+        curr_start_i = 0
 
         for it in range(n_iterations):
 
@@ -86,9 +87,23 @@ class RestrictedBoltzmannMachine():
             # you may need to use the inference functions 'get_h_given_v' and 'get_v_given_h'.
             # note that inference methods returns both probabilities and activations (samples from probablities) and you may have to decide when to use what.
             # k is the number of steps of alternating sampling 
+
+            '''
+            Then, iterate the training process (CD) for the number of
+            epochs varying between 10 and 20 for minibatches of size around 20 (i.e.
+            each epoch corresponds to a full swipe through a training set divided into
+            minibatches).
+            I CHANGED THE DEFAULT N_ITERATIONS OF 10 000 TO 800 AS PER LAB INSTRUCTIONS
+
+            "When using CDn, only the final update of the hidden units should use the probability." - practical pdf
+            '''
             
-            # minibatch of size 200
-            self.get_h_given_v(visible_trainset[:200])
+            # minibatch of size 20
+            if curr_start_i > n_samples-20:
+                _, _ = self.get_h_given_v(visible_trainset[curr_start_i:])
+                curr_start_i = 0
+            else:
+                _, _ = self.get_h_given_v(visible_trainset[curr_start_i:curr_start_i+20])
 
             # [TODO TASK 4.1] update the parameters using function 'update_params'
             
@@ -103,6 +118,8 @@ class RestrictedBoltzmannMachine():
             if it % self.print_period == 0 :
 
                 print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(visible_trainset - visible_trainset)))
+            
+            curr_start_i += 20
         
         return
     
@@ -153,12 +170,13 @@ class RestrictedBoltzmannMachine():
         # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of hidden layer (replace the zeros below)
         #  The probability of a hidden unit j turning ON can then b e driven from the visible units by sampling from p(hj = 1) = σ(bj + ∑i wij vi)
         print("WEIGHT SHAPE, MINIB", self.weight_vh.shape, visible_minibatch.shape, self.bias_h.shape)
+
         mult = np.outer(self.weight_vh, visible_minibatch)
         print("mult shape ", mult.shape)
         sum = np.sum(mult, axis=0)
         print("sum ", sum.shape)
         p_h_given_v = sigmoid(self.bias_h + sum)
-        print("H GOVEN V ", p_h_given_v)
+        print("H GIVEN V ", p_h_given_v)
         h = np.zeros(n_samples)
         for i, p in enumerate(p_h_given_v):
             if p > 0.5:
