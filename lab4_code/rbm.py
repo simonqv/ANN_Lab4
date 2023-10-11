@@ -111,6 +111,7 @@ class RestrictedBoltzmannMachine():
                 _, h_reconstruct = self.get_h_given_v(visible_trainset)
                 _, v_reconstruct = self.get_v_given_h(h_reconstruct)
                 print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(visible_trainset - v_reconstruct)))
+                print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(v_0_mini_batch - v_1_activation)))
                 print("check if same reference", visible_trainset is v_reconstruct)
                 diff = visible_trainset == v_reconstruct
                 print("number of differences", len(diff[diff == False]))
@@ -134,36 +135,12 @@ class RestrictedBoltzmannMachine():
         """
 
         # [TODO TASK 4.1 DONE] get the gradients from the arguments (replace the 0s below) and update the weight and bias parameters
-        """
-        """
         bias_v = np.sum((v_0 - v_k), axis = 0)
         self.delta_bias_v = self.learning_rate * (bias_v / self.batch_size)
         self.delta_weight_vh = self.momentum * self.delta_weight_vh + self.learning_rate * ( v_0.T@h_0 - v_k.T@h_k)
         bias_h = np.sum((h_0 - h_k), axis = 0)
         self.delta_bias_h = self.learning_rate * (bias_h / self.batch_size)
-        """
-        g1 = 0
-        g2 = 0
-        g3 = 0
 
-        for i in range(self.batch_size):
-            g1 += v_0[i] - v_k[i]
-            g3 += h_0[i] - h_k[i]
-
-        g2 += v_0.T @ h_0 - v_k.T @ h_k  # np.outer(v_0[i], h_0[i]) - np.outer(v_k[i], h_k[i])
-        self.delta_bias_v = (self.momentum * self.delta_bias_v
-                             + self.learning_rate * g1 / self.batch_size
-                             - self.learning_rate * self.delta_bias_v * self.penalty)
-
-        self.delta_weight_vh = (self.momentum * self.delta_weight_vh
-                                + self.learning_rate * g2 / self.batch_size
-                                - self.learning_rate * self.delta_weight_vh * self.penalty)
-
-        self.delta_bias_h = (self.momentum * self.delta_bias_h
-                             + self.learning_rate * g3 / self.batch_size
-                             - self.learning_rate * self.delta_bias_h * self.penalty)
-
-        """
         self.bias_v += self.delta_bias_v
         self.weight_vh += self.delta_weight_vh / self.batch_size
         self.bias_h += self.delta_bias_h
@@ -171,8 +148,8 @@ class RestrictedBoltzmannMachine():
         return
 
     def get_h_given_v(self,visible_minibatch):
-
-        """Compute probabilities p(h|v) and activations h ~ p(h|v)
+        
+        """Compute probabilities p(h|v) and activations h ~ p(h|v) 
 
         Uses undirected weight "weight_vh" and bias "bias_h"
         
