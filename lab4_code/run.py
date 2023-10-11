@@ -2,10 +2,6 @@ from util import *
 from rbm import RestrictedBoltzmannMachine 
 from dbn import DeepBeliefNet
 
-'''
-        DON'T TOUCH
-'''
-
 if __name__ == "__main__":
 
     image_size = [28,28]
@@ -24,7 +20,7 @@ if __name__ == "__main__":
                                      batch_size=10
     )
     
-    rbm.cd1(visible_trainset=train_imgs, n_iterations=800)#n_iterations=10000)      changed to 800 because 784/minib_size * 20epochs ≈ 800
+    rbm.cd1(visible_trainset=train_imgs, n_iterations=10000)
     
     ''' deep- belief net '''
 
