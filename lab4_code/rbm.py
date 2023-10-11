@@ -66,7 +66,7 @@ class RestrictedBoltzmannMachine():
         return
 
         
-    def cd1(self,visible_trainset, n_iterations=10000):
+    def cd1(self, visible_trainset, n_iterations=10000):
         
         """Contrastive Divergence with k=1 full alternating Gibbs sampling
 
@@ -76,8 +76,9 @@ class RestrictedBoltzmannMachine():
         """
 
         print ("learning CD1")
-        
+        print("START Vi Train", visible_trainset[:5][0:10])
         n_samples = visible_trainset.shape[0]
+        print("n samples", n_samples)
 
         # visible_trainset (size of training set, size of visible layer) = (60k, 784)
         for it in range(n_iterations):
@@ -89,14 +90,13 @@ class RestrictedBoltzmannMachine():
             iarr = np.random.randint(0, n_samples, size=self.batch_size)
 
             v_0_mini_batch = visible_trainset[iarr]  # training data from one mini batch
-            print("SHAPE v0 MINI BATCH", v_0_mini_batch.shape)
             h_0_prob, h_0_activation = self.get_h_given_v(v_0_mini_batch)
             v_1_prob, v_1_activation = self.get_v_given_h(h_0_activation)
             h_1_prob, h_1_activation = self.get_h_given_v(v_1_activation)
                
 
             # [TODO TASK 4.1] update the parameters using function 'update_params'
-            self.update_params(v_0_mini_batch,h_0_activation,v_1_activation,h_1_activation)
+            self.update_params(v_0_mini_batch, h_0_activation, v_1_activation, h_1_activation)
 
             # visualize once in a while when visible layer is input images
             
@@ -107,8 +107,13 @@ class RestrictedBoltzmannMachine():
             # print progress
             
             if it % self.print_period == 0 :
-
-                print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(visible_trainset - visible_trainset)))
+                _, h_reconstruct = self.get_h_given_v(visible_trainset)
+                _, v_reconstruct = self.get_v_given_h(h_reconstruct)
+                print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(visible_trainset - v_reconstruct)))
+                print("check if same reference", visible_trainset is v_reconstruct)
+                diff = visible_trainset == v_reconstruct
+                print("number of differences", len(diff[diff == False]))
+                
     
         return
     
@@ -129,10 +134,8 @@ class RestrictedBoltzmannMachine():
 
         # [TODO TASK 4.1 DONE] get the gradients from the arguments (replace the 0s below) and update the weight and bias parameters
         bias_v = np.sum((v_0 - v_k), axis = 0)
-        print("SHAPE BIAS V", bias_v.shape)
         self.delta_bias_v += (bias_v / self.batch_size)
-        self.delta_weight_vh += v_0.T@h_0 - v_k.T@h_k
-        print("SHAPE DELTA WEIGHT", self.delta_weight_vh.shape)
+        self.delta_weight_vh = v_0.T@h_0 - v_k.T@h_k
         bias_h = np.sum((h_0 - h_k), axis = 0)
         self.delta_bias_h += (bias_h / self.batch_size)
         

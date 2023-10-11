@@ -12,7 +12,7 @@ if __name__ == "__main__":
     print ("\nStarting a Restricted Boltzmann Machine..")
 
     rbm = RestrictedBoltzmannMachine(ndim_visible=image_size[0]*image_size[1],
-                                     ndim_hidden=200,
+                                     ndim_hidden=500,
                                      is_bottom=True,
                                      image_size=image_size,
                                      is_top=False,
@@ -20,8 +20,10 @@ if __name__ == "__main__":
                                      batch_size=20
     )
     
-    rbm.cd1(visible_trainset=train_imgs, n_iterations=10000)
-    
+    rbm.cd1(visible_trainset=train_imgs, n_iterations= 30000)#10000)
+    print("RBM WEIGHTS TRUE SHAPE", rbm.weight_vh.shape)
+    print("RBM WEIGHTS", " -5: ", len(rbm.weight_vh[rbm.weight_vh<-5])," 5: ",len(rbm.weight_vh[rbm.weight_vh>5]))
+    print(rbm.weight_vh[rbm.weight_vh<-5][0:100])
     ''' deep- belief net '''
 
     print ("\nStarting a Deep Belief Net..")
