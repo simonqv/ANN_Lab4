@@ -170,12 +170,18 @@ class RestrictedBoltzmannMachine():
         # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of hidden layer (replace the zeros below)
         #  The probability of a hidden unit j turning ON can then b e driven from the visible units by sampling from p(hj = 1) = σ(bj + ∑i wij vi)
         print("WEIGHT SHAPE, MINIB", self.weight_vh.shape, visible_minibatch.shape, self.bias_h.shape)
+        sum_arr = np.zeros(200)
+        for i, v in enumerate(visible_minibatch[0]):
+            arr = np.zeros(200)
+            for j, h in enumerate(self.weight_vh[i]):
+                wih = v * h
+                arr[j] = wih
+                print(v)
+            print("pause")
+            sum_arr += arr
+            print(sum_arr)
 
-        mult = np.outer(self.weight_vh, visible_minibatch)
-        print("mult shape ", mult.shape)
-        sum = np.sum(mult, axis=0)
-        print("sum ", sum.shape)
-        p_h_given_v = sigmoid(self.bias_h + sum)
+        p_h_given_v = sigmoid(self.bias_h + sum_arr)
         print("H GIVEN V ", p_h_given_v)
         h = np.zeros(n_samples)
         for i, p in enumerate(p_h_given_v):
