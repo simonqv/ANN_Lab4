@@ -116,11 +116,12 @@ class RestrictedBoltzmannMachine():
            all args have shape (size of mini-batch, size of respective layer)
         """
 
-        # [TODO TASK 4.1] get the gradients from the arguments (replace the 0s below) and update the weight and bias parameters
-        
-        self.delta_bias_v += 0
-        self.delta_weight_vh += 0
-        self.delta_bias_h += 0
+        # [TODO TASK 4.1 DONE] get the gradients from the arguments (replace the 0s below) and update the weight and bias parameters
+        bias_v = np.sum((v_0 - v_k), axis = 1)
+        self.delta_bias_v += (bias_v / self.batch_size)
+        self.delta_weight_vh += v_0.T*h_0 - v_k.T*h_k
+        bias_h = np.sum((h_0 - h_k), axis = 1)
+        self.delta_bias_h += (bias_h / self.batch_size)
         
         self.bias_v += self.delta_bias_v
         self.weight_vh += self.delta_weight_vh
@@ -147,7 +148,11 @@ class RestrictedBoltzmannMachine():
 
         # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of hidden layer (replace the zeros below) 
         
-        return np.zeros((n_samples,self.ndim_hidden)), np.zeros((n_samples,self.ndim_hidden))
+        # 20 x 200
+        on_probs = sigmoid(self.bias_h + (visible_minibatch @ self.weight_vh))
+        activations = sample_binary(on_probs)
+        
+        return on_probs, activations
 
 
     def get_v_given_h(self,hidden_minibatch):
@@ -183,11 +188,13 @@ class RestrictedBoltzmannMachine():
             
         else:
                         
-            # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of visible layer (replace the pass and zeros below)             
-
-            pass
+            # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of visible layer (replace the pass and zeros below)  
+            
+            # 20 x 200
+            on_probs = sigmoid(self.bias_v + (hidden_minibatch @ self.weight_vh.T))
+            activations = sample_binary(on_probs)
         
-        return np.zeros((n_samples,self.ndim_visible)), np.zeros((n_samples,self.ndim_visible))
+        return on_probs, activations           
 
 
     
