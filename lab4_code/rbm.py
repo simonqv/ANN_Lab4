@@ -92,7 +92,7 @@ class RestrictedBoltzmannMachine():
             v_0_mini_batch = visible_trainset[iarr]  # training data from one mini batch
             h_0_prob, h_0_activation = self.get_h_given_v(v_0_mini_batch)
             v_1_prob, v_1_activation = self.get_v_given_h(h_0_activation)
-            h_1_prob, h_1_activation = self.get_h_given_v(v_1_activation)
+            h_1_prob, h_1_activation = self.get_h_given_v(v_1_prob)
                
 
             # [TODO TASK 4.1] update the parameters using function 'update_params'
@@ -110,6 +110,7 @@ class RestrictedBoltzmannMachine():
                 _, h_reconstruct = self.get_h_given_v(visible_trainset)
                 _, v_reconstruct = self.get_v_given_h(h_reconstruct)
                 print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(visible_trainset - v_reconstruct)))
+                print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(v_0_mini_batch - v_1_activation)))
                 print("check if same reference", visible_trainset is v_reconstruct)
                 diff = visible_trainset == v_reconstruct
                 print("number of differences", len(diff[diff == False]))
@@ -134,10 +135,10 @@ class RestrictedBoltzmannMachine():
 
         # [TODO TASK 4.1 DONE] get the gradients from the arguments (replace the 0s below) and update the weight and bias parameters
         bias_v = np.sum((v_0 - v_k), axis = 0)
-        self.delta_bias_v += (bias_v / self.batch_size)
+        self.delta_bias_v = (bias_v )#/ self.batch_size)
         self.delta_weight_vh = v_0.T@h_0 - v_k.T@h_k
         bias_h = np.sum((h_0 - h_k), axis = 0)
-        self.delta_bias_h += (bias_h / self.batch_size)
+        self.delta_bias_h = (bias_h)# / self.batch_size)
         
         self.bias_v += self.delta_bias_v
         self.weight_vh += self.delta_weight_vh
@@ -206,7 +207,8 @@ class RestrictedBoltzmannMachine():
             on_probs_label = softmax(labels)
             on_probs_normal = sigmoid(normal)
             on_probs = np.concatenate((on_probs_normal, on_probs_label), axis=1)
-            activities = np.concatenate((sample_binary(on_probs_normal), sample_categorical(on_probs_label)), axis=1)
+            activities = np.concatenate((sample_binary(on_probs_normal), \
+                                         sample_categorical(on_probs_label)), axis=1)
             
         else:
                         
