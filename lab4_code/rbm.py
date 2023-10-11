@@ -182,7 +182,7 @@ class RestrictedBoltzmannMachine():
                 wih = v * h
                 arr[j] = wih
                 print(v)
-            print("pause")
+            # print("pause")
             sum_arr += arr
             print(sum_arr)
 
@@ -193,7 +193,6 @@ class RestrictedBoltzmannMachine():
             if p > 0.5:
                 h[i] = 1
 
-        
         return (p_h_given_v, h)
 
 
@@ -232,9 +231,26 @@ class RestrictedBoltzmannMachine():
                         
             # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of visible layer (replace the pass and zeros below)             
 
-            pass
-        
-        return np.zeros((n_samples,self.ndim_visible)), np.zeros((n_samples,self.ndim_visible))
+            print("WEIGHT SHAPE, MINIB", self.weight_vh.shape, hidden_minibatch.shape, self.bias_v.shape)
+            sum_arr = np.zeros(200)
+            for i, h in enumerate(hidden_minibatch[0]):
+                arr = np.zeros(200)
+                for j, v in enumerate(self.weight_vh[i]):
+                    wiv = h * v
+                    arr[j] = wiv
+                    print(h)
+
+                sum_arr += arr
+                print(sum_arr)
+
+            p_v_given_h = sigmoid(self.bias_v + sum_arr)
+            print("V GIVEN H ", p_v_given_h)
+            h = np.zeros(n_samples)
+            for i, p in enumerate(p_v_given_h):
+                if p > 0.5:
+                    h[i] = 1
+
+        return (p_v_given_h, h)  # np.zeros((n_samples,self.ndim_visible)), np.zeros((n_samples,self.ndim_visible))
 
 
     
