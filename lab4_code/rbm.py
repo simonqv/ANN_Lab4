@@ -96,6 +96,7 @@ class RestrictedBoltzmannMachine():
             I CHANGED THE DEFAULT N_ITERATIONS OF 10 000 TO 800 AS PER LAB INSTRUCTIONS
 
             "When using CDn, only the final update of the hidden units should use the probability." - practical pdf
+            rest should use 1 or 0
             '''
             
             # minibatch of size 20
@@ -132,16 +133,20 @@ class RestrictedBoltzmannMachine():
 
         Args:
            v_0: activities or probabilities of visible layer (data to the rbm)
-           h_0: activities or probabilities of hidden layer
+           h_0: activities or probabilities of hidden layer from data 
            v_k: activities or probabilities of visible layer
-           h_k: activities or probabilities of hidden layer
+           h_k: activities or probabilities of hidden layer after k steps og gibbs sampling (the reconstructed version)
            all args have shape (size of mini-batch, size of respective layer)
         """
 
         # [TODO TASK 4.1] get the gradients from the arguments (replace the 0s below) and update the weight and bias parameters
         
+        '''
+        var e learning rate?
+        '''
+        
         self.delta_bias_v += 0
-        self.delta_weight_vh += 0
+        self.delta_weight_vh += 0 # v_0*h_0 - v_k*h_k  egentligen <> runt
         self.delta_bias_h += 0
         
         self.bias_v += self.delta_bias_v
@@ -168,7 +173,7 @@ class RestrictedBoltzmannMachine():
         n_samples = visible_minibatch.shape[0]
 
         # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of hidden layer (replace the zeros below)
-        #  The probability of a hidden unit j turning ON can then b e driven from the visible units by sampling from p(hj = 1) = σ(bj + ∑i wij vi)
+        #  The probability of a hidden unit j turning ON can then be driven from the visible units by sampling from p(hj = 1) = σ(bj + ∑i wij vi)
         print("WEIGHT SHAPE, MINIB", self.weight_vh.shape, visible_minibatch.shape, self.bias_h.shape)
         sum_arr = np.zeros(200)
         for i, v in enumerate(visible_minibatch[0]):
