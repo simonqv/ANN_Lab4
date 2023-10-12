@@ -143,7 +143,10 @@ class DeepBeliefNet():
             """ 
             CD-1 training for vis--hid 
             """  
+            #self.rbm_stack['vis--hid'].untwine_weights()
+            #self.rbm_stack['vis--hid'].cd1_dir(vis_trainset)
             self.rbm_stack['vis--hid'].cd1(vis_trainset)
+            self.rbm_stack['vis--hid'].untwine_weights()
 
             self.savetofile_rbm(loc="lab4_code/trained_rbm",name="vis--hid")
 
@@ -151,11 +154,22 @@ class DeepBeliefNet():
             """ 
             CD-1 training for hid--pen 
             """            
-            h_prob, h_states = self.rbm_stack['hid--pen'].get_h_given_v(vis_trainset)
-            self.rbm_stack["vis--hid"].untwine_weights() 
-            self.rbm_stack["vis--hid"].cd1(h_states)
+            h_prob, h_states = self.rbm_stack['vis--hid'].get_h_given_v_dir(vis_trainset)
+            self.rbm_stack["hid--pen"].cd1(h_states)
 
-            self.savetofile_rbm(loc="lab4_code/trained_rbm",name="hid--pen")            
+            self.savetofile_rbm(loc="lab4_code/trained_rbm",name="hid--pen")   
+
+            print("DONE WITH vis--hid and hid--pen")    
+            print("Convergence plot")
+
+            plt.figure()
+            plt.plot(self.rbm_stack['vis--hid'].iterations, self.rbm_stack['vis--hid'].reconstruction_loss, label="vis--hid 500 nodes")  
+            plt.plot(self.rbm_stack['hid--pen'].iterations, self.rbm_stack['hid--pen'].reconstruction_loss, label="hid--pen 500 nodes")        
+            plt.xlabel("Iteration")
+            plt.ylabel("Average Reconstruction Error")
+            plt.title("Convergence")
+            plt.legend()
+            plt.show()
 
             print ("training pen+lbl--top")
             """ 
