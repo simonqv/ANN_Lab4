@@ -11,19 +11,37 @@ if __name__ == "__main__":
     
     print ("\nStarting a Restricted Boltzmann Machine..")
 
-    rbm = RestrictedBoltzmannMachine(ndim_visible=image_size[0]*image_size[1],
-                                     ndim_hidden=500,
-                                     is_bottom=True,
-                                     image_size=image_size,
-                                     is_top=False,
-                                     n_labels=10,
-                                     batch_size=20
-    )
+    # Task 1: plot convergence for different values ndim_hidden 200-500
+    # OBS! if you just set  hidden_node_list = [500], you will get the weight visualisation plot
+    hidden_node_list = [200, 500]#[500, 400, 300, 200]
+    y = []
+    plt.figure()
+    plt.xlabel("Iteration")
+    plt.ylabel("Average Reconstruction Loss")
+    plt.title("Convergence")
+    for number_of_hidden_nodes in hidden_node_list:
+        rbm = RestrictedBoltzmannMachine(ndim_visible=image_size[0]*image_size[1],
+                                        ndim_hidden=number_of_hidden_nodes,
+                                        is_bottom=True,
+                                        image_size=image_size,
+                                        is_top=False,
+                                        n_labels=10,
+                                        batch_size=20
+        )
+        rbm.cd1(visible_trainset=train_imgs, n_iterations=10000)#30000)
+        y.append(rbm.reconstruction_loss)
+        print("RBM WEIGHTS TRUE SHAPE", rbm.weight_vh.shape)
+        print("RBM WEIGHTS", " -5: ", len(rbm.weight_vh[rbm.weight_vh<-5])," 5: ",len(rbm.weight_vh[rbm.weight_vh>5]))
+        print(rbm.weight_vh[rbm.weight_vh<-5][0:100])
+
+        print("AVG RECON LOSS", rbm.iterations)
     
-    rbm.cd1(visible_trainset=train_imgs, n_iterations= 30000)#10000)
-    print("RBM WEIGHTS TRUE SHAPE", rbm.weight_vh.shape)
-    print("RBM WEIGHTS", " -5: ", len(rbm.weight_vh[rbm.weight_vh<-5])," 5: ",len(rbm.weight_vh[rbm.weight_vh>5]))
-    print(rbm.weight_vh[rbm.weight_vh<-5][0:100])
+    for i, nhidden_dim in enumerate(hidden_node_list):
+        plt.plot(rbm.iterations, y[i], label=f"{nhidden_dim} hidden nodes")
+        plt.legend()
+
+    plt.show()
+
     ''' deep- belief net '''
 
     print ("\nStarting a Deep Belief Net..")
