@@ -56,7 +56,11 @@ class RestrictedBoltzmannMachine():
         
         self.momentum = 0.7
 
-        self.print_period = 5000
+        self.print_period = 1000
+
+        self.reconstruction_loss = []
+
+        self.iterations = []
         
         self.rf = { # receptive-fields. Only applicable when visible layer is input data
             "period" : 5000, # iteration period to visualize
@@ -75,7 +79,8 @@ class RestrictedBoltzmannMachine():
           visible_trainset: training data for this rbm, shape is (size of training set, size of visible layer)
           n_iterations: number of iterations of learning (each iteration learns a mini-batch)
         """
-
+        average_reconstruction_loss = []
+        iterations = []
         print ("learning CD1")
         print("START Vi Train", visible_trainset[:5][0:10])
         n_samples = visible_trainset.shape[0]
@@ -83,7 +88,7 @@ class RestrictedBoltzmannMachine():
 
         # visible_trainset (size of training set, size of visible layer) = (60k, 784)
         for it in range(n_iterations):
-
+        
             #for index in range(0, n_samples, self.batch_size):
             # [TODO TASK 4.1] run k=1 alternating Gibbs sampling : v_0 -> h_0 ->  v_1 -> h_1.
             # you may need to use the inference functions 'get_h_given_v' and 'get_v_given_h'.
@@ -104,7 +109,7 @@ class RestrictedBoltzmannMachine():
             if it % self.rf["period"] == 0 and self.is_bottom:
                 
                 viz_rf(weights=self.weight_vh[:,self.rf["ids"]].reshape((self.image_size[0],self.image_size[1],-1)), it=it, grid=self.rf["grid"])
-
+                
             # print progress
             
             if it % self.print_period == 0 :
@@ -116,7 +121,38 @@ class RestrictedBoltzmannMachine():
                 diff = visible_trainset == v_reconstruct
                 print("number of differences", len(diff[diff == False]))
                 
-    
+                self.iterations.append(it)
+                self.reconstruction_loss.append(np.linalg.norm(visible_trainset - v_reconstruct)/n_samples)
+            
+            # Visualise a specific receptive field / weights for a specific node
+            '''
+            if it % 5*self.print_period == 0:
+                col_nr = 25
+                # Reshape the weights and normalize them for visualization
+                normalized_weights = (self.weight_vh - np.min(self.weight_vh)) / (np.max(self.weight_vh) - np.min(self.weight_vh))
+
+                # Create a figure with subplots for each hidden unit (visualise weights)
+                plt.title(f"Visualise weights, after {n_iterations} for hidden node{col_nr}")
+                plt.figure(figsize=(10, 10))
+            
+                plt.subplot(1, 6, i + 1)  # Change the subplot layout as needed
+                plt.imshow(normalized_weights[:, i].reshape(28, 28), cmap='gray')
+                    plt.axis('off')
+            '''
+        # Below you can find the weight visualisation plot for ndim_hidden = 500
+        if self.ndim_hidden == 500 and len(self.reconstruction_loss) == 0:
+            # Reshape the weights and normalize them for visualization
+            normalized_weights = (self.weight_vh - np.min(self.weight_vh)) / (np.max(self.weight_vh) - np.min(self.weight_vh))
+
+            # Create a figure with subplots for each hidden unit (visualise weights)
+            plt.figure(figsize=(10, 10))
+            plt.title(f"Visualise weights, after {n_iterations}")
+            for i in range(self.ndim_hidden):  # Assuming you have 500 hidden units
+                plt.subplot(20, 25, i + 1)  # Change the subplot layout as needed
+                plt.imshow(normalized_weights[:, i].reshape(28, 28), cmap='gray')
+                plt.axis('off')
+            plt.show()
+
         return
     
 
