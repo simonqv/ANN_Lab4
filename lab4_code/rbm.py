@@ -201,9 +201,8 @@ class RestrictedBoltzmannMachine():
         n_samples = visible_minibatch.shape[0]
 
         # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of hidden layer (replace the zeros below) 
-        
-        # 20 x 200
-        on_probs = sigmoid(self.bias_h + (visible_minibatch @ self.weight_vh))
+
+        on_probs = sigmoid(self.bias_h + np.dot(visible_minibatch, self.weight_vh))
         activations = sample_binary(on_probs)
         
         return on_probs, activations
@@ -263,7 +262,7 @@ class RestrictedBoltzmannMachine():
     
 
     def untwine_weights(self):
-        
+        print("untwine weights weight_vh:", self.weight_vh.shape)
         self.weight_v_to_h = np.copy( self.weight_vh )
         self.weight_h_to_v = np.copy( np.transpose(self.weight_vh) )
         self.weight_vh = None
@@ -286,7 +285,6 @@ class RestrictedBoltzmannMachine():
         n_samples = visible_minibatch.shape[0]
 
         # [TODO TASK 4.2] perform same computation as the function 'get_h_given_v' but with directed connections (replace the zeros below) 
-        print("shapes!!!", visible_minibatch.shape, "@", self.weight_v_to_h.shape)
         on_probs = sigmoid(self.bias_h + (visible_minibatch @ self.weight_v_to_h))
         activations = sample_binary(on_probs)
         
