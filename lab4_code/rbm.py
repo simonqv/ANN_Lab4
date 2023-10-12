@@ -286,8 +286,10 @@ class RestrictedBoltzmannMachine():
         n_samples = visible_minibatch.shape[0]
 
         # [TODO TASK 4.2] perform same computation as the function 'get_h_given_v' but with directed connections (replace the zeros below) 
+        on_probs = sigmoid(self.bias_h + (visible_minibatch @ self.weight_v_to_h))
+        activations = sample_binary(on_probs)
         
-        return np.zeros((n_samples,self.ndim_hidden)), np.zeros((n_samples,self.ndim_hidden))
+        return on_probs, activations
 
 
     def get_v_given_h_dir(self,hidden_minibatch):
@@ -320,16 +322,26 @@ class RestrictedBoltzmannMachine():
             # [TODO TASK 4.2] Note that even though this function performs same computation as 'get_v_given_h' but with directed connections,
             # this case should never be executed : when the RBM is a part of a DBN and is at the top, it will have not have directed connections.
             # Appropriate code here is to raise an error (replace pass below)
-            
-            pass
+            support = self.bias_v + (hidden_minibatch @ self.weight_h_to_v.T)
+            labels = support[:, -self.n_labels:]
+            normal = support[:, :-self.n_labels]
+
+            on_probs_label = softmax(labels)
+            on_probs_normal = sigmoid(normal)
+            on_probs = np.concatenate((on_probs_normal, on_probs_label), axis=1)
+            activities = np.concatenate((sample_binary(on_probs_normal), sample_categorical(on_probs_label)), axis=1)
+       
             
         else:
                         
-            # [TODO TASK 4.2] performs same computaton as the function 'get_v_given_h' but with directed connections (replace the pass and zeros below)             
+            # [TODO TASK 4.2] performs same computaton as the function 'get_v_given_h' but with directed connections (replace the pass and zeros below)   
+            # 
+            on_probs = sigmoid(self.bias_v + (hidden_minibatch @ self.weight_h_to_v.T))
+            activities = sample_binary(on_probs)          
 
-            pass
             
-        return np.zeros((n_samples,self.ndim_visible)), np.zeros((n_samples,self.ndim_visible))        
+            
+        return on_probs, activities       
         
     def update_generate_params(self,inps,trgs,preds):
         

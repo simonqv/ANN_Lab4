@@ -142,14 +142,19 @@ class DeepBeliefNet():
             print ("training vis--hid")
             """ 
             CD-1 training for vis--hid 
-            """            
+            """  
+            self.rbm_stack['vis--hid'].cd1(vis_trainset)
+
             self.savetofile_rbm(loc="lab4_code/trained_rbm",name="vis--hid")
 
             print ("training hid--pen")
             """ 
             CD-1 training for hid--pen 
             """            
-            self.rbm_stack["vis--hid"].untwine_weights()            
+            h_prob, h_states = self.rbm_stack['hid--pen'].get_h_given_v(vis_trainset)
+            self.rbm_stack["vis--hid"].untwine_weights() 
+            self.rbm_stack["vis--hid"].cd1(h_states)
+
             self.savetofile_rbm(loc="lab4_code/trained_rbm",name="hid--pen")            
 
             print ("training pen+lbl--top")
