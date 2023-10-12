@@ -286,6 +286,7 @@ class RestrictedBoltzmannMachine():
         n_samples = visible_minibatch.shape[0]
 
         # [TODO TASK 4.2] perform same computation as the function 'get_h_given_v' but with directed connections (replace the zeros below) 
+        print("shapes!!!", visible_minibatch.shape, "@", self.weight_v_to_h.shape)
         on_probs = sigmoid(self.bias_h + (visible_minibatch @ self.weight_v_to_h))
         activations = sample_binary(on_probs)
         
