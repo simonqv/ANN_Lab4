@@ -13,12 +13,9 @@ if __name__ == "__main__":
 
     # Task 1: plot convergence for different values ndim_hidden 200-500
     # OBS! if you just set  hidden_node_list = [500], you will get the weight visualisation plot
-    hidden_node_list = [200, 500]#[500, 400, 300, 200]
+    hidden_node_list = [500, 400, 300, 200] #[200, 500]
     y = []
     plt.figure()
-    plt.xlabel("Iteration")
-    plt.ylabel("Average Reconstruction Loss")
-    plt.title("Convergence")
     for number_of_hidden_nodes in hidden_node_list:
         rbm = RestrictedBoltzmannMachine(ndim_visible=image_size[0]*image_size[1],
                                         ndim_hidden=number_of_hidden_nodes,
@@ -39,6 +36,10 @@ if __name__ == "__main__":
     for i, nhidden_dim in enumerate(hidden_node_list):
         plt.plot(rbm.iterations, y[i], label=f"{nhidden_dim} hidden nodes")
         plt.legend()
+
+    plt.xlabel("Iteration")
+    plt.ylabel("Average Reconstruction Error")
+    plt.title("Convergence")
 
     plt.show()
 

@@ -372,3 +372,87 @@ class RestrictedBoltzmannMachine():
         self.bias_h += self.delta_bias_h
         
         return    
+
+
+    def cd1_dir(self, visible_trainset, n_iterations=10000):
+            
+            """Contrastive Divergence with k=1 full alternating Gibbs sampling
+
+            Args:
+            visible_trainset: training data for this rbm, shape is (size of training set, size of visible layer)
+            n_iterations: number of iterations of learning (each iteration learns a mini-batch)
+            """
+            average_reconstruction_loss = []
+            iterations = []
+            print ("learning CD1 DIR!")
+            n_samples = visible_trainset.shape[0]
+            print("n samples", n_samples)
+
+            # visible_trainset (size of training set, size of visible layer) = (60k, 784)
+            for it in range(n_iterations):
+            
+                #for index in range(0, n_samples, self.batch_size):
+                # [TODO TASK 4.1] run k=1 alternating Gibbs sampling : v_0 -> h_0 ->  v_1 -> h_1.
+                # you may need to use the inference functions 'get_h_given_v' and 'get_v_given_h'.
+                # note that inference methods returns both probabilities and activations (samples from probablities) and you may have to decide when to use what.
+                iarr = np.random.randint(0, n_samples, size=self.batch_size)
+
+                v_0_mini_batch = visible_trainset[iarr]  # training data from one mini batch
+                h_0_prob, h_0_activation = self.get_h_given_v(v_0_mini_batch)
+                v_1_prob, v_1_activation = self.get_v_given_h(h_0_activation)
+                h_1_prob, h_1_activation = self.get_h_given_v(v_1_activation)
+                
+
+                # [TODO TASK 4.1] update the parameters using function 'update_params'
+                self.update_params(v_0_mini_batch, h_0_activation, v_1_activation, h_1_activation)
+
+                # visualize once in a while when visible layer is input images
+                
+                if it % self.rf["period"] == 0 and self.is_bottom:
+                    
+                    viz_rf(weights=self.weight_vh[:,self.rf["ids"]].reshape((self.image_size[0],self.image_size[1],-1)), it=it, grid=self.rf["grid"])
+                    
+                # print progress
+                
+                if it % self.print_period == 0 :
+                    _, h_reconstruct = self.get_h_given_v(visible_trainset)
+                    _, v_reconstruct = self.get_v_given_h(h_reconstruct)
+                    print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(visible_trainset - v_reconstruct)))
+                    print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(v_0_mini_batch - v_1_activation)))
+                    print("check if same reference", visible_trainset is v_reconstruct)
+                    diff = visible_trainset == v_reconstruct
+                    print("number of differences", len(diff[diff == False]))
+                    
+                    self.iterations.append(it)
+                    self.reconstruction_loss.append(np.linalg.norm(visible_trainset - v_reconstruct)/n_samples)
+                
+                # Visualise a specific receptive field / weights for a specific node
+                '''
+                if it % 5*self.print_period == 0:
+                    col_nr = 25
+                    # Reshape the weights and normalize them for visualization
+                    normalized_weights = (self.weight_vh - np.min(self.weight_vh)) / (np.max(self.weight_vh) - np.min(self.weight_vh))
+
+                    # Create a figure with subplots for each hidden unit (visualise weights)
+                    plt.title(f"Visualise weights, after {n_iterations} for hidden node{col_nr}")
+                    plt.figure(figsize=(10, 10))
+                
+                    plt.subplot(1, 6, i + 1)  # Change the subplot layout as needed
+                    plt.imshow(normalized_weights[:, i].reshape(28, 28), cmap='gray')
+                        plt.axis('off')
+                '''
+            # Below you can find the weight visualisation plot for ndim_hidden = 500
+            if self.ndim_hidden == 500 and len(self.reconstruction_loss) == 0:
+                # Reshape the weights and normalize them for visualization
+                normalized_weights = (self.weight_vh - np.min(self.weight_vh)) / (np.max(self.weight_vh) - np.min(self.weight_vh))
+
+                # Create a figure with subplots for each hidden unit (visualise weights)
+                plt.figure(figsize=(10, 10))
+                plt.title(f"Visualise weights, after {n_iterations}")
+                for i in range(self.ndim_hidden):  # Assuming you have 500 hidden units
+                    plt.subplot(20, 25, i + 1)  # Change the subplot layout as needed
+                    plt.imshow(normalized_weights[:, i].reshape(28, 28), cmap='gray')
+                    plt.axis('off')
+                plt.show()
+
+            return
