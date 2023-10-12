@@ -45,6 +45,8 @@ if __name__ == "__main__":
     '''
     ''' deep- belief net '''
 
+    print("train lbls", train_lbls)
+    print(train_lbls.shape)
     print ("\nStarting a Deep Belief Net..")
     
     dbn = DeepBeliefNet(sizes={"vis":image_size[0]*image_size[1], "hid":500, "pen":500, "top":2000, "lbl":10},
