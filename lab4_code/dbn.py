@@ -114,9 +114,11 @@ class DeepBeliefNet():
         #probs, states = self.rbm_stack['pen+lbl--top'].get_v_given_h(lbl) # TODO HÄR ÄR FEL, FIX THIS probs, states = self.rbm_stack['pen+lbl--top'].get_v_given_h(lbl) WRONG DIMENSIONS
         
         # Create the visible layer data
-        random_vis = np.random.rand(1, 500)
+        random_vis = np.random.choice([0,1], self.sizes['hid']).reshape(-1,self.sizes['hid']) #np.random.rand(1, 500)
+        #_, random_vis = self.rbm_stack['vis--hid'].get_h_given_v_dir(random_vis)
+        #_, random_vis = self.rbm_stack['hid--pen'].get_h_given_v_dir(random_vis)
+
         states = np.concatenate((random_vis, lbl), axis=1)
-        print("START SHAPE", states.shape)
         # Do gibbs sampling
         for i in range(self.n_gibbs_gener):
             print(f"GIBBS ITERATION {i} of {self.n_gibbs_recog}")
@@ -125,16 +127,13 @@ class DeepBeliefNet():
             states[:, -true_lbl.shape[1]:] = lbl
            
             vis = states[:, :-true_lbl.shape[1]]
-            print("VIS STATE", vis.shape)
             _, hid = self.rbm_stack['hid--pen'].get_v_given_h_dir(vis)
-            print("HID STATE", hid.shape)
-            print(self.rbm_stack['vis--hid'].weight_h_to_v.shape)
             _, vis = self.rbm_stack['vis--hid'].get_v_given_h_dir(hid)
-            print("VIS STATE", vis.shape)
             records.append( [ ax.imshow(vis.reshape(self.image_size), cmap="bwr", vmin=0, vmax=1, animated=True, interpolation=None) ] )
         
 
         predicted_lbl = 0
+
 
         anim = stitch_video(fig,records).save("%s.generate%d.mp4"%(name,np.argmax(true_lbl)))            
             
@@ -186,7 +185,7 @@ class DeepBeliefNet():
             """  
             #self.rbm_stack['vis--hid'].untwine_weights()
             #self.rbm_stack['vis--hid'].cd1_dir(vis_trainset)
-            self.rbm_stack['vis--hid'].cd1(vis_trainset)
+            self.rbm_stack['vis--hid'].cd1(vis_trainset, n_iterations)
             self.savetofile_rbm(loc="lab4_code/trained_rbm",name="vis--hid")
             self.rbm_stack['vis--hid'].untwine_weights()
 
@@ -195,7 +194,7 @@ class DeepBeliefNet():
             CD-1 training for hid--pen 
             """            
             hid_prob, hid_states = self.rbm_stack['vis--hid'].get_h_given_v_dir(vis_trainset)
-            self.rbm_stack["hid--pen"].cd1(hid_states)
+            self.rbm_stack["hid--pen"].cd1(hid_states, n_iterations)
             self.savetofile_rbm(loc="lab4_code/trained_rbm",name="hid--pen")   
 
             print("DONE WITH vis--hid and hid--pen")    
@@ -219,7 +218,7 @@ class DeepBeliefNet():
             top_vis_states = np.concatenate((pen_states, lbl_trainset), axis=1)
             print("rbm stack weights",  self.rbm_stack['pen+lbl--top'].weight_vh.shape)
 
-            self.rbm_stack['pen+lbl--top'].cd1(top_vis_states)
+            self.rbm_stack['pen+lbl--top'].cd1(top_vis_states, n_iterations)
 
             self.savetofile_rbm(loc="lab4_code/trained_rbm",name="pen+lbl--top")            
         return    

@@ -8,9 +8,9 @@ if __name__ == "__main__":
     train_imgs,train_lbls,test_imgs,test_lbls = read_mnist(dim=image_size, n_train=60000, n_test=10000)
 
     ''' restricted boltzmann machine '''
-    '''
+    
     print ("\nStarting a Restricted Boltzmann Machine..")
-
+    '''
     # Task 1: plot convergence for different values ndim_hidden 200-500
     # OBS! if you just set  hidden_node_list = [500], you will get the weight visualisation plot
     hidden_node_list = [500, 400, 300, 200] #[200, 500]
@@ -25,7 +25,7 @@ if __name__ == "__main__":
                                         n_labels=10,
                                         batch_size=20
         )
-        rbm.cd1(visible_trainset=train_imgs, n_iterations=10000)#30000)
+        rbm.cd1(visible_trainset=train_imgs, n_iterations=30000)#30000)    # 10 epochs  = 30000 iterations
         y.append(rbm.reconstruction_loss)
         print("RBM WEIGHTS TRUE SHAPE", rbm.weight_vh.shape)
         print("RBM WEIGHTS", " -5: ", len(rbm.weight_vh[rbm.weight_vh<-5])," 5: ",len(rbm.weight_vh[rbm.weight_vh>5]))
@@ -43,6 +43,7 @@ if __name__ == "__main__":
 
     plt.show()
     '''
+    
     ''' deep- belief net '''
 
     print("train lbls", train_lbls)
@@ -57,7 +58,7 @@ if __name__ == "__main__":
     
     ''' greedy layer-wise training '''
 
-    dbn.train_greedylayerwise(vis_trainset=train_imgs, lbl_trainset=train_lbls, n_iterations=10000)
+    dbn.train_greedylayerwise(vis_trainset=train_imgs, lbl_trainset=train_lbls, n_iterations=30000)
     
     print("STARTING RECOGNIZE TRAIN DATA")
     #dbn.recognize(train_imgs, train_lbls)
