@@ -111,17 +111,26 @@ class DeepBeliefNet():
 
         # [TODO TASK 4.2] fix the label in the label layer and run alternating Gibbs sampling in the top RBM. From the top RBM, drive the network \ 
         # top to the bottom visible layer (replace 'vis' from random to your generated visible layer).
-        probs, states = self.rbm_stack['pen+lbl--top'].get_v_given_h(lbl) # TODO HÄR ÄR FEL, FIX THIS probs, states = self.rbm_stack['pen+lbl--top'].get_v_given_h(lbl) WRONG DIMENSIONS
+        #probs, states = self.rbm_stack['pen+lbl--top'].get_v_given_h(lbl) # TODO HÄR ÄR FEL, FIX THIS probs, states = self.rbm_stack['pen+lbl--top'].get_v_given_h(lbl) WRONG DIMENSIONS
+        
+        # Create the visible layer data
+        random_vis = np.random.rand(1, 500)
+        states = np.concatenate((random_vis, lbl), axis=1)
+        print("START SHAPE", states.shape)
+        # Do gibbs sampling
         for i in range(self.n_gibbs_gener):
             print(f"GIBBS ITERATION {i} of {self.n_gibbs_recog}")
             probs, states = self.rbm_stack['pen+lbl--top'].get_h_given_v(states)
             probs, states = self.rbm_stack['pen+lbl--top'].get_v_given_h(states)
-            states[:, -lbl.shape[1]:] = lbl
-
-            vis = states[:, -lbl.shape[1]:] # np.random.rand(n_sample,self.sizes["vis"])
+            states[:, -true_lbl.shape[1]:] = lbl
+           
+            vis = states[:, :-true_lbl.shape[1]]
+            print("VIS STATE", vis.shape)
             _, hid = self.rbm_stack['hid--pen'].get_v_given_h_dir(vis)
+            print("HID STATE", hid.shape)
+            print(self.rbm_stack['vis--hid'].weight_h_to_v.shape)
             _, vis = self.rbm_stack['vis--hid'].get_v_given_h_dir(hid)
-            
+            print("VIS STATE", vis.shape)
             records.append( [ ax.imshow(vis.reshape(self.image_size), cmap="bwr", vmin=0, vmax=1, animated=True, interpolation=None) ] )
         
 

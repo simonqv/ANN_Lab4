@@ -335,7 +335,8 @@ class RestrictedBoltzmannMachine():
                         
             # [TODO TASK 4.2] performs same computaton as the function 'get_v_given_h' but with directed connections (replace the pass and zeros below)   
             # 
-            on_probs = sigmoid(self.bias_v + (hidden_minibatch @ self.weight_h_to_v.T))
+            #on_probs = sigmoid(self.bias_v + (hidden_minibatch @ self.weight_h_to_v.T))
+            on_probs = sigmoid(self.bias_v + (hidden_minibatch @ self.weight_h_to_v))
             activities = sample_binary(on_probs)          
 
             
