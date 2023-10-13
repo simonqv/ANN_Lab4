@@ -16,8 +16,6 @@ class RestrictedBoltzmannMachine():
           n_label: Number of label categories.
           batch_size: Size of mini-batch.
         """
-        self.penalty = 0.0001
-
         self.ndim_visible = ndim_visible
 
         self.ndim_hidden = ndim_hidden
@@ -72,7 +70,7 @@ class RestrictedBoltzmannMachine():
 
         
     def cd1(self, visible_trainset, n_iterations=10000):
-        
+
         """Contrastive Divergence with k=1 full alternating Gibbs sampling
 
         Args:

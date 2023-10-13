@@ -58,7 +58,7 @@ if __name__ == "__main__":
     
     ''' greedy layer-wise training '''
 
-    dbn.train_greedylayerwise(vis_trainset=train_imgs, lbl_trainset=train_lbls, n_iterations=30000)
+    dbn.train_greedylayerwise(vis_trainset=train_imgs, lbl_trainset=train_lbls, n_iterations=10000)
     
     print("STARTING RECOGNIZE TRAIN DATA")
     #dbn.recognize(train_imgs, train_lbls)
